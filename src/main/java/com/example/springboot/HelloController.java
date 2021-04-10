@@ -32,8 +32,6 @@ public class HelloController {
 	public String startingrow;
 	@Value("${app.spreadsheetid}")
 	public String spreadsheetid;
-	@Value("${app.apikey}")
-	private String apikey;
 	@Value("${app.appname}")
 	private String appname;
 
@@ -51,7 +49,7 @@ public class HelloController {
 	@GetMapping("/getDancers")
 	public List<List<Object>> getDancers() throws GeneralSecurityException, IOException
 	{
-		ValueRange dance = sheetsService.spreadsheets().values().get("1OZmEaZR0YkCoOwqttsYJUf0FTMmStBG3YMolDtHF5kM","Sheet1!F7").execute();
+		ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid,currentdance).execute();
 		String curdancers = "'"+dance.getValues().get(0).get(0).toString()+"'!"+column;
 
 		ValueRange dancers= sheetsService.spreadsheets().values().get(spreadsheetid,curdancers).execute();
@@ -88,7 +86,6 @@ public class HelloController {
 				GoogleNetHttpTransport.newTrustedTransport(),
 				JacksonFactory.getDefaultInstance(), cred)
 				.setApplicationName(appname)
-				.setSheetsRequestInitializer(new SheetsRequestInitializer(apikey))
 				.build();
 	}
 
