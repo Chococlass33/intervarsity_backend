@@ -1,29 +1,25 @@
 package com.example.springboot;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.SheetsRequestInitializer;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import com.google.api.client.json.gson.GsonFactory;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.time.Instant;
 import java.util.*;
 
 @CrossOrigin
 @RestController
 public class HelloController {
+
 	@Value("${app.currentdance}")
 	public String currentdance;
 	@Value("${app.dancernamecolumn}")
@@ -41,36 +37,12 @@ public class HelloController {
     @Value("${app.frontendclientid}")
     public String frontendclientid;
 
-
-
 	public Sheets sheetsService = getSheetsService();
     public NetHttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();
+
 	public HelloController() throws IOException, GeneralSecurityException
 	{
-
 	}
-
-//	@RequestMapping("/")
-//	public String index() {
-//		return "Greetings from Spring Boot!";
-//	}
-
-//	@GetMapping("/getDancers")
-//	public Dancers getDancers() throws GeneralSecurityException, IOException
-//	{
-//		ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid,currentdance).execute();
-//		String curdancers = "'"+dance.getValues().get(0).get(0).toString()+"'!"+column;
-//
-//		ValueRange dancers= sheetsService.spreadsheets().values().get(spreadsheetid,curdancers).setMajorDimension("COLUMNS").execute();
-//
-//		System.out.print(dancers);
-//
-//		Dancers d = new Dancers();
-//		d.currentDance = dance.getValues().get(0).get(0).toString();
-//		d.dancers = dancers.getValues();
-//
-//		return d;
-//	}
 
     @PostMapping("/postDancers")
     public Dancers postDancers(@RequestBody String token) throws GeneralSecurityException, IOException
@@ -111,25 +83,6 @@ public class HelloController {
             return null;
         }
     }
-
-
-//	@GetMapping("/checkCurrent/{currentdance}")
-//	public boolean checkCurrent(@PathVariable String currentdance) throws GeneralSecurityException, IOException
-//	{
-//		ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid,currentdance).execute();
-//		String curdance = dance.getValues().get(0).get(0).toString();
-//
-//		return (curdance.contentEquals(currentdance));
-//	}
-
-//	@GetMapping("/getCurrent")
-//	public String getCurrent() throws GeneralSecurityException, IOException
-//	{
-//		ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid,currentdance).execute();
-//		String curdance = dance.getValues().get(0).get(0).toString();
-//
-//		return (curdance);
-//	}
 
 	@PostMapping("/postCurrent")
 	public String postCurrent(@RequestBody String token) throws GeneralSecurityException, IOException
@@ -215,4 +168,43 @@ public class HelloController {
 				.build();
 	}
 
+
+//	@RequestMapping("/")
+//	public String index() {
+//		return "Greetings from Spring Boot!";
+//	}
+
+//	@GetMapping("/getDancers")
+//	public Dancers getDancers() throws GeneralSecurityException, IOException
+//	{
+//		ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid,currentdance).execute();
+//		String curdancers = "'"+dance.getValues().get(0).get(0).toString()+"'!"+column;
+//
+//		ValueRange dancers= sheetsService.spreadsheets().values().get(spreadsheetid,curdancers).setMajorDimension("COLUMNS").execute();
+//
+//		System.out.print(dancers);
+//
+//		Dancers d = new Dancers();
+//		d.currentDance = dance.getValues().get(0).get(0).toString();
+//		d.dancers = dancers.getValues();
+//
+//		return d;
+//	}
+	//	@GetMapping("/checkCurrent/{currentdance}")
+//	public boolean checkCurrent(@PathVariable String currentdance) throws GeneralSecurityException, IOException
+//	{
+//		ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid,currentdance).execute();
+//		String curdance = dance.getValues().get(0).get(0).toString();
+//
+//		return (curdance.contentEquals(currentdance));
+//	}
+
+//	@GetMapping("/getCurrent")
+//	public String getCurrent() throws GeneralSecurityException, IOException
+//	{
+//		ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid,currentdance).execute();
+//		String curdance = dance.getValues().get(0).get(0).toString();
+//
+//		return (curdance);
+//	}
 }
