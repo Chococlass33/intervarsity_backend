@@ -39,14 +39,17 @@ public class HelloController {
 	public String googlesheetclientid;
 	public String googlesheetsclientsecret;
 
+	public String backend;
+
 	public Sheets sheetsService;
     public NetHttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();
 
-	public HelloController(@Value("${app.googlesheetclientid}") String googlesheetclientid, @Value("${app.googlesheetsclientsecret}") String googlesheetsclientsecret) throws IOException, GeneralSecurityException
+	public HelloController(@Value("${app.googlesheetclientid}") String googlesheetclientid, @Value("${app.googlesheetsclientsecret}") String googlesheetsclientsecret,@Value("${app.backend}") String frontend) throws IOException, GeneralSecurityException
 	{
+		this.backend= backend;
 		this.googlesheetclientid = googlesheetclientid;
 		this.googlesheetsclientsecret = googlesheetsclientsecret;
-		sheetsService =getSheetsService(googlesheetclientid, googlesheetsclientsecret);
+		sheetsService =getSheetsService(googlesheetclientid, googlesheetsclientsecret,frontend);
 	}
 
     @PostMapping("/postDancers")
@@ -163,9 +166,9 @@ public class HelloController {
         }
 	}
 
-	public Sheets getSheetsService(String id, String secret) throws IOException, GeneralSecurityException
+	public Sheets getSheetsService(String id, String secret, String frontend) throws IOException, GeneralSecurityException
 	{
-		Credential cred = GoogleAuthorizeUtil.authorize(id,secret);
+		Credential cred = GoogleAuthorizeUtil.authorize(id,secret,frontend);
 		return new Sheets.Builder(
 				GoogleNetHttpTransport.newTrustedTransport(),
 				GsonFactory.getDefaultInstance(), cred)
