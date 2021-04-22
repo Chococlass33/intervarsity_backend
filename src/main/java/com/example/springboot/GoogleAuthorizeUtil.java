@@ -18,11 +18,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GoogleAuthorizeUtil {
-    public static Credential authorize(String clientid, String clientSecrets, String frontend) throws IOException, GeneralSecurityException {
+    public static Credential authorize(String clientid, String clientSecrets, String backend) throws IOException, GeneralSecurityException {
 
         List<String> scopes = Arrays.asList(SheetsScopes.SPREADSHEETS);
         LocalServerReceiver receiver =
-                new LocalServerReceiver.Builder().setHost(frontend).build();
+                new LocalServerReceiver.Builder().setCallbackPath(backend).build();
 
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), GsonFactory.getDefaultInstance(),clientid, clientSecrets, scopes).setDataStoreFactory(new MemoryDataStoreFactory())

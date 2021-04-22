@@ -44,12 +44,12 @@ public class HelloController {
 	public Sheets sheetsService;
     public NetHttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();
 
-	public HelloController(@Value("${app.googlesheetclientid}") String googlesheetclientid, @Value("${app.googlesheetsclientsecret}") String googlesheetsclientsecret,@Value("${app.backend}") String frontend) throws IOException, GeneralSecurityException
+	public HelloController(@Value("${app.googlesheetclientid}") String googlesheetclientid, @Value("${app.googlesheetsclientsecret}") String googlesheetsclientsecret,@Value("${app.backendurl}") String backend) throws IOException, GeneralSecurityException
 	{
 		this.backend= backend;
 		this.googlesheetclientid = googlesheetclientid;
 		this.googlesheetsclientsecret = googlesheetsclientsecret;
-		sheetsService =getSheetsService(googlesheetclientid, googlesheetsclientsecret,frontend);
+		sheetsService =getSheetsService(googlesheetclientid, googlesheetsclientsecret,backend);
 	}
 
     @PostMapping("/postDancers")
@@ -177,10 +177,10 @@ public class HelloController {
 	}
 
 
-//	@RequestMapping("/")
-//	public String index() {
-//		return "Greetings from Spring Boot!";
-//	}
+	@RequestMapping("/")
+	public String index() {
+		return "Greetings from Spring Boot!";
+	}
 
 //	@GetMapping("/getDancers")
 //	public Dancers getDancers() throws GeneralSecurityException, IOException
