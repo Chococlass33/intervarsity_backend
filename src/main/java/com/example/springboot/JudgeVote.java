@@ -5,6 +5,6 @@ import java.util.List;
 
 public class JudgeVote
 {
-    public String judgeID;
+    public String token;
     public List<String> vote;
 }

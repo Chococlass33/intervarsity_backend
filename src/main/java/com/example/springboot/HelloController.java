@@ -2,22 +2,26 @@ package com.example.springboot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsRequestInitializer;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import com.google.api.client.json.gson.GsonFactory;
+
 
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 
+@CrossOrigin
 @RestController
 public class HelloController {
 	@Value("${app.currentdance}")
@@ -33,50 +37,172 @@ public class HelloController {
 	@Value("${app.spreadsheetid}")
 	public String spreadsheetid;
 	@Value("${app.appname}")
-	private String appname;
+	public String appname;
+    @Value("${app.frontendclientid}")
+    public String frontendclientid;
 
-	public Sheets sheetsService = getSheetsService();;
 
+
+	public Sheets sheetsService = getSheetsService();
+    public NetHttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();
 	public HelloController() throws IOException, GeneralSecurityException
 	{
+
 	}
 
-	@RequestMapping("/")
-	public String index() {
-		return "Greetings from Spring Boot!";
-	}
+//	@RequestMapping("/")
+//	public String index() {
+//		return "Greetings from Spring Boot!";
+//	}
 
-	@GetMapping("/getDancers")
-	public List<List<Object>> getDancers() throws GeneralSecurityException, IOException
+//	@GetMapping("/getDancers")
+//	public Dancers getDancers() throws GeneralSecurityException, IOException
+//	{
+//		ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid,currentdance).execute();
+//		String curdancers = "'"+dance.getValues().get(0).get(0).toString()+"'!"+column;
+//
+//		ValueRange dancers= sheetsService.spreadsheets().values().get(spreadsheetid,curdancers).setMajorDimension("COLUMNS").execute();
+//
+//		System.out.print(dancers);
+//
+//		Dancers d = new Dancers();
+//		d.currentDance = dance.getValues().get(0).get(0).toString();
+//		d.dancers = dancers.getValues();
+//
+//		return d;
+//	}
+
+    @PostMapping("/postDancers")
+    public Dancers postDancers(@RequestBody String token) throws GeneralSecurityException, IOException
+    {
+
+		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, GsonFactory.getDefaultInstance())
+				// Specify the CLIENT_ID of the app that accesses the backend:
+				.setAudience(Arrays.asList(frontendclientid))
+				// Or, if multiple clients access the backend:
+				//.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
+				.build();
+
+//		System.out.println(token);
+		GoogleIdToken idToken = GoogleIdToken.parse(verifier.getJsonFactory(), token);
+
+		boolean tokenIsValid = (idToken != null) && verifier.verify(idToken);
+
+		GoogleIdToken.Payload payload = idToken.getPayload();
+		String email = payload.getEmail();
+
+		if (tokenIsValid && judgeid.indexOf(email) != -1)
+        {
+            ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid, currentdance).execute();
+            String curdancers = "'" + dance.getValues().get(0).get(0).toString() + "'!" + column;
+
+            ValueRange dancers = sheetsService.spreadsheets().values().get(spreadsheetid, curdancers).setMajorDimension("COLUMNS").execute();
+
+            System.out.print(dancers);
+
+            Dancers d = new Dancers();
+            d.currentDance = dance.getValues().get(0).get(0).toString();
+            d.dancers = dancers.getValues();
+
+            return d;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+
+//	@GetMapping("/checkCurrent/{currentdance}")
+//	public boolean checkCurrent(@PathVariable String currentdance) throws GeneralSecurityException, IOException
+//	{
+//		ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid,currentdance).execute();
+//		String curdance = dance.getValues().get(0).get(0).toString();
+//
+//		return (curdance.contentEquals(currentdance));
+//	}
+
+//	@GetMapping("/getCurrent")
+//	public String getCurrent() throws GeneralSecurityException, IOException
+//	{
+//		ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid,currentdance).execute();
+//		String curdance = dance.getValues().get(0).get(0).toString();
+//
+//		return (curdance);
+//	}
+
+	@PostMapping("/postCurrent")
+	public String postCurrent(@RequestBody String token) throws GeneralSecurityException, IOException
 	{
-		ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid,currentdance).execute();
-		String curdancers = "'"+dance.getValues().get(0).get(0).toString()+"'!"+column;
+		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, GsonFactory.getDefaultInstance())
+				// Specify the CLIENT_ID of the app that accesses the backend:
+				.setAudience(Arrays.asList(frontendclientid))
+				// Or, if multiple clients access the backend:
+				//.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
+				.build();
 
-		ValueRange dancers= sheetsService.spreadsheets().values().get(spreadsheetid,curdancers).execute();
+//		System.out.println(token);
+		GoogleIdToken idToken = GoogleIdToken.parse(verifier.getJsonFactory(), token);
 
-		System.out.print(dancers);
+		boolean tokenIsValid = (idToken != null) && verifier.verify(idToken);
 
-		return dancers.getValues();
+		GoogleIdToken.Payload payload = idToken.getPayload();
+		String email = payload.getEmail();
+
+		if (tokenIsValid && judgeid.indexOf(email) != -1)
+		{
+			ValueRange dance = sheetsService.spreadsheets().values().get(spreadsheetid, currentdance).execute();
+			String curdance = dance.getValues().get(0).get(0).toString();
+
+			return (curdance);
+		}
+		return null;
 	}
 
 
 	@PostMapping("/setDancers/{dance}")
-	public void setDancers(@RequestParam String judgeID, @RequestParam List<String> vote, @PathVariable String dance) throws GeneralSecurityException, IOException{
+	public void setDancers(@RequestBody JudgeVote judgevote, @PathVariable String dance) throws GeneralSecurityException, IOException{
 
-		String jcolumn = judgecolumn.get(judgeid.indexOf(judgeID));
-		String range = "'" + dance +"'" + "!" + jcolumn + startingrow + ":" + jcolumn;
-		ValueRange values = new ValueRange();
+		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, GsonFactory.getDefaultInstance())
+				// Specify the CLIENT_ID of the app that accesses the backend:
+				.setAudience(Arrays.asList(frontendclientid))
+				// Or, if multiple clients access the backend:
+				//.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
+				.build();
 
-		List<List<Object>> i = new ArrayList<>();
-		for(String stuff:vote)
-		{
-			i.add(Arrays.asList(stuff));
-		}
-		values.setValues(i);
+		GoogleIdToken idToken = GoogleIdToken.parse(verifier.getJsonFactory(), judgevote.token);
 
-		System.out.println(i);
+		boolean tokenIsValid = (idToken != null) && verifier.verify(idToken);
 
-		sheetsService.spreadsheets().values().update(spreadsheetid,range,values).setValueInputOption("RAW").execute();
+
+		if (tokenIsValid)
+        {
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail();
+
+            if (judgeid.indexOf(email) != -1)
+            {
+
+                String jcolumn = judgecolumn.get(judgeid.indexOf(email));
+                String range = "'" + dance + "'" + "!" + jcolumn + startingrow + ":" + jcolumn;
+                ValueRange values = new ValueRange();
+
+                List<List<Object>> i = new ArrayList<>();
+                for (String stuff : judgevote.vote)
+                {
+                    i.add(Arrays.	asList(stuff));
+                }
+                values.setValues(i);
+
+//                System.out.println(i);
+
+                sheetsService.spreadsheets().values().update(spreadsheetid, range, values).setValueInputOption("RAW").execute();
+            }
+        }
+        else
+        {
+            System.out.println("Invalid ID token.");
+        }
 	}
 
 	public Sheets getSheetsService() throws IOException, GeneralSecurityException
@@ -84,7 +210,7 @@ public class HelloController {
 		Credential cred = GoogleAuthorizeUtil.authorize();
 		return new Sheets.Builder(
 				GoogleNetHttpTransport.newTrustedTransport(),
-				JacksonFactory.getDefaultInstance(), cred)
+				GsonFactory.getDefaultInstance(), cred)
 				.setApplicationName(appname)
 				.build();
 	}
