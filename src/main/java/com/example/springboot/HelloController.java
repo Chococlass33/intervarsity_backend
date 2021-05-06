@@ -44,7 +44,7 @@ public class HelloController {
 	public Sheets sheetsService;
     public NetHttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();
 
-	public HelloController(@Value("${app.googlesheetclientid}") String googlesheetclientid, @Value("${app.googlesheetsclientsecret}") String googlesheetsclientsecret,@Value("${app.backendurl}") String backend) throws IOException, GeneralSecurityException
+	public HelloController(@Value("${app.googlesheetclientid}") String googlesheetclientid, @Value("${app.googlesheetsclientsecret}") String googlesheetsclientsecret,@Value("${app.backend}") String backend) throws IOException, GeneralSecurityException
 	{
 		this.backend= backend;
 		this.googlesheetclientid = googlesheetclientid;
@@ -166,9 +166,9 @@ public class HelloController {
         }
 	}
 
-	public Sheets getSheetsService(String id, String secret, String frontend) throws IOException, GeneralSecurityException
+	public Sheets getSheetsService(String id, String secret, String backend) throws IOException, GeneralSecurityException
 	{
-		Credential cred = GoogleAuthorizeUtil.authorize(id,secret,frontend);
+		Credential cred = GoogleAuthorizeUtil.authorize(id,secret,backend);
 		return new Sheets.Builder(
 				GoogleNetHttpTransport.newTrustedTransport(),
 				GsonFactory.getDefaultInstance(), cred)

@@ -22,7 +22,7 @@ public class GoogleAuthorizeUtil {
 
         List<String> scopes = Arrays.asList(SheetsScopes.SPREADSHEETS);
         LocalServerReceiver receiver =
-                new LocalServerReceiver.Builder().setCallbackPath(backend).build();
+                new LocalServerReceiver.Builder().setHost(backend).setCallbackPath("/").build();
 
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), GsonFactory.getDefaultInstance(),clientid, clientSecrets, scopes).setDataStoreFactory(new MemoryDataStoreFactory())
