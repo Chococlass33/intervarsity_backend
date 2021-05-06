@@ -1,12 +1,14 @@
 package com.example.springboot;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import com.google.api.client.json.gson.GsonFactory;
@@ -36,20 +38,20 @@ public class HelloController {
 	public String appname;
     @Value("${app.frontendclientid}")
     public String frontendclientid;
-	public String googlesheetclientid;
-	public String googlesheetsclientsecret;
+//	public String googlesheetclientid;
+//	public String googlesheetsclientsecret;
 
-	public String backend;
+	public String serviceacc;
 
 	public Sheets sheetsService;
     public NetHttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();
 
-	public HelloController(@Value("${app.googlesheetclientid}") String googlesheetclientid, @Value("${app.googlesheetsclientsecret}") String googlesheetsclientsecret,@Value("${app.backend}") String backend) throws IOException, GeneralSecurityException
+	public HelloController(@Value("${app.googlesheetclientid}") String googlesheetclientid, @Value("${app.googlesheetsclientsecret}") String googlesheetsclientsecret,@Value("${app.serviceacc}") String serviceacc) throws IOException, GeneralSecurityException
 	{
-		this.backend= backend;
-		this.googlesheetclientid = googlesheetclientid;
-		this.googlesheetsclientsecret = googlesheetsclientsecret;
-		sheetsService =getSheetsService(googlesheetclientid, googlesheetsclientsecret,backend);
+		this.serviceacc= serviceacc;
+//		this.googlesheetclientid = googlesheetclientid;
+//		this.googlesheetsclientsecret = googlesheetsclientsecret;
+		sheetsService =getSheetsService(serviceacc);
 	}
 
     @PostMapping("/postDancers")
@@ -166,9 +168,9 @@ public class HelloController {
         }
 	}
 
-	public Sheets getSheetsService(String id, String secret, String backend) throws IOException, GeneralSecurityException
+	public Sheets getSheetsService(String serviceacc) throws IOException, GeneralSecurityException
 	{
-		Credential cred = GoogleAuthorizeUtil.authorize(id,secret,backend);
+		GoogleCredential cred = GoogleAuthorizeUtil.authservice(serviceacc);
 		return new Sheets.Builder(
 				GoogleNetHttpTransport.newTrustedTransport(),
 				GsonFactory.getDefaultInstance(), cred)
